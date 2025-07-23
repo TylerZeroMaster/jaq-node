@@ -1,0 +1,36 @@
+[package]
+name = "jaq-node"
+version = "0.0.1"
+edition = "2024"
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false
+
+# https://github.com/leptos-rs/cargo-leptos/issues/441
+# https://github.com/fzyzcjy/flutter_rust_bridge/issues/2601
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-O','--all-features']
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+jaq-core = "2.2.1"
+jaq-json = "1.1.3"
+jaq-std = "2.1.2"
+
+aho-corasick = "1.1.2"
+codesnake = { version = "0.2" }
+hifijson = "0.2"
+log = "0.4.17"
+unicode-width = "0.1.13"
+
+console_log = { version = "1.0", features = ["color"] }
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = { version = "0.2" }
+js-sys = { version = "0.3" }
+
+[profile.release]
+strip = true
+codegen-units = 1
+
