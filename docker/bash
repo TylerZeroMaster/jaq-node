@@ -2,23 +2,17 @@
 
 set -euo pipefail
 
-docker() {
-    if command -V docker &>/dev/null; then
-        command docker "$@"
-    elif command -V podman &>/dev/null; then
-        podman "$@"
-    else
-        echo "Could not find docker or podman" >&2
-        exit 1
-    fi
-}
+container_engine="$(
+    for engine in docker podman; do command -v "$engine" && exit 0; done
+    echo "Could not find supported container engine." >&2 && exit 1
+)"
 
 here=$(cd "$(dirname "$0")" && pwd)
 repo_root="$(cd "$here/.." && pwd)"
 repo_name="$(basename "$repo_root")"
 
 cd "$here"
-img_id="$(echo "Building docker image..." >&2 && docker build -q .)"
+img_id="$(echo "Building docker image..." >&2 && "$container_engine" build -q .)"
 
 run_args=(--entrypoint bash)
 run_args+=(--rm)
@@ -30,4 +24,4 @@ if test -t 0; then
     run_args+=(--tty)
 fi
 
-exec docker run "${run_args[@]}" "$img_id" "$@"
+exec "$container_engine" run "${run_args[@]}" "$img_id" "$@"
